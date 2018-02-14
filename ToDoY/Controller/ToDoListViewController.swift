@@ -12,27 +12,15 @@ class ToDoListViewController: UITableViewController {
 
     var itemArray : [Item] = [Item]()
     
-    // setting the reference to UserDefaults
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Shoshana.plist")
     
+    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem : Item = Item()
-        newItem.title = "L"
-        itemArray.append(newItem)
+        loadItems()
         
-        let newItem2 : Item = Item()
-        newItem.title = "Lir"
-        itemArray.append(newItem2)
-        
-        let newItem3 : Item = Item()
-        newItem.title = "Liraz"
-        itemArray.append(newItem3)
-        
-        if let items = defaults.array(forKey: "ToSoListArray") as? [Item] {
-            itemArray = items
-        }
     }
 
     //MARK: Table Datasource Method
@@ -66,6 +54,8 @@ class ToDoListViewController: UITableViewController {
         
         // short way
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        saveItems()
         
         // long way
 //        if itemArray[indexPath.row].done == false {
@@ -101,8 +91,8 @@ class ToDoListViewController: UITableViewController {
                 newItem.title = textField.text!
                 self.itemArray.append(newItem)
                 
-                // saving to UserDefaults
-                self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+                // caling the saveItems method
+                self.saveItems()
                 
                 // reload 
                 self.tableView.reloadData()
@@ -116,5 +106,43 @@ class ToDoListViewController: UITableViewController {
         //present(alert, animated: true, completion: nil)
     }
     
+    // Mark: - Model manipulaton Methods
+    
+    func saveItems() {
+        // create an encoder
+        let encoder : PropertyListEncoder = PropertyListEncoder()
+        
+        do {
+            // encoding the
+            let data = try encoder.encode(itemArray)
+            // writing our data custom file
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error saving item array: \(error)")
+        }
+    }
+    
+    func loadItems() {
+        
+        do {
+            let data = try Data(contentsOf: dataFilePath!)
+            let decodar : PropertyListDecoder = PropertyListDecoder()
+            
+            // this is the method that decodes our data. we have to specify what is the data type of the decoded value.
+            // our data is array of item - [Item]. we have to add the .self so it will know that we are referring to our Item type and not an Object.
+            itemArray = try decodar.decode([Item].self, from: data)
+        } catch {
+            print("Error decoding item array: \(error)")
+        }
+        
+//        if let dataTwo = try? Data(contentsOf: dataFilePath!) {
+//            let decoderTwo : PropertyListDecoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoderTwo.decode([Item].self, from: dataTwo)
+//            } catch {
+//                print("Error decoding item array: \(error)")
+//            }
+//        }
+    }
 }
 
