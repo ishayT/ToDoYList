@@ -10,7 +10,7 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 
-    var itemArray : [String] = ["Shoshana", "Damari", "Ofra Haza"]
+    var itemArray : [Item] = [Item]()
     
     // setting the reference to UserDefaults
     let defaults = UserDefaults.standard
@@ -18,10 +18,21 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let newItem : Item = Item()
+        newItem.title = "L"
+        itemArray.append(newItem2)
         
-        if let items = defaults.array(forKey: "ToSoListArray") as? [String] {
-            itemArray = items
-        }
+        let newItem2 : Item = Item()
+        newItem.title = "Lir"
+        itemArray.append(newItem)
+        
+        let newItem3 : Item = Item()
+        newItem.title = "Liraz"
+        itemArray.append(newItem3)
+        
+//        if let items = defaults.array(forKey: "ToSoListArray") as? [String] {
+//            itemArray = items
+//        }
     }
 
     //MARK: Table Datasource Method
@@ -32,21 +43,32 @@ class ToDoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        // because the itemArray is now an Item and not a String
+        cell.textLabel?.text = itemArray[indexPath.row].title
+        
+        if itemArray[indexPath.row].done == true {
+            cell.accessoryType == .checkmark
+        } else {
+            cell.accessoryType == .none
+        }
+        
         return cell
     }
     
     //MARK - Tableview Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Row number: \(indexPath.row), Text is: \(itemArray[indexPath.row])")
-    
-    
-    // add checkbox to selected row
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-    } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-    }
+        
+        // short way
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        // long way
+//        if itemArray[indexPath.row].done == false {
+//            itemArray[indexPath.row].done = true
+//        } else {
+//            itemArray[indexPath.row].done = false
+//        }
+        
+        tableView.reloadData()
     
     // change appearance of selected row
     tableView.deselectRow(at: indexPath, animated: true)
