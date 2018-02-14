@@ -12,9 +12,16 @@ class ToDoListViewController: UITableViewController {
 
     var itemArray : [String] = ["Shoshana", "Damari", "Ofra Haza"]
     
+    // setting the reference to UserDefaults
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        if let items = defaults.array(forKey: "ToSoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
     //MARK: Table Datasource Method
@@ -29,7 +36,7 @@ class ToDoListViewController: UITableViewController {
         return cell
     }
     
-    //MARK: Tableview Delegate Methods
+    //MARK - Tableview Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row number: \(indexPath.row), Text is: \(itemArray[indexPath.row])")
     
@@ -45,7 +52,7 @@ class ToDoListViewController: UITableViewController {
     tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    //MARK: add new items
+    //MARK - add new items
     @IBAction func addButtonPress(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -63,7 +70,9 @@ class ToDoListViewController: UITableViewController {
             { (action) in
                 // what will happen when the user clicks add
                 self.itemArray.append(textField.text!)
-                print(self.itemArray)
+                
+                // saving to UserDefaults
+                self.defaults.set(self.itemArray, forKey: "ToDoListArray")
                 
                 // reload 
                 self.tableView.reloadData()
